@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-[60vh] flex flex-col items-center justify-center">
+    <!-- Hero Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            より良い<span class="text-slack-purple">コミュニケーション</span>を
+        </h1>
+        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl">
+            パワハラフィルターチャットは、安全で健全なコミュニケーションを支援する
+            Slack風チャットアプリケーションです。
+        </p>
+        <div class="flex justify-center space-x-4">
+            <a href="/auth/register" 
+               class="bg-slack-purple hover:bg-purple-800 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl">
+                無料で始める
+            </a>
+            <a href="#features" 
+               class="bg-white hover:bg-gray-100 text-slack-purple font-bold py-3 px-8 rounded-lg text-lg transition-colors border-2 border-slack-purple">
+                詳しく見る
+            </a>
+        </div>
+    </div>
+    
+    <!-- Features Section -->
+    <div id="features" class="w-full max-w-5xl">
+        <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-10">主な機能</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div class="w-12 h-12 bg-slack-blue rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">リアルタイムチャット</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    WebSocketを使用したリアルタイムメッセージングで、スムーズなコミュニケーションを実現。
+                </p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div class="w-12 h-12 bg-slack-green rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">ハラスメント防止</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    AI判定と報告機能により、不適切なメッセージを事前に検知し、健全な環境を維持。
+                </p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div class="w-12 h-12 bg-slack-yellow rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">管理者ダッシュボード</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    報告状況や傾向を可視化し、組織のコミュニケーション健全性を把握。
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
