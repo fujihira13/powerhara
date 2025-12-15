@@ -30,7 +30,7 @@
                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">メールアドレス</label>
                     <input id="email" name="username" type="email" autocomplete="email" required 
                            class="mt-1 appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-slack-purple focus:border-transparent focus:z-10 sm:text-sm transition-all" 
-                           placeholder="name@example.com">
+                           placeholder="例: name@example.com">
                 </div>
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">パスワード</label>
@@ -121,10 +121,9 @@ async function handleLogin(event) {
         // トークンを保存（localStorageなど）
         localStorage.setItem('token', data.access_token);
         
-        // クッキーにも保存しておくと便利（HTMXなどで使う場合）
-        // SameSite=Laxを追加してセキュリティ向上と挙動安定化
-        document.cookie = `access_token=${data.access_token}; path=/; max-age=1800; SameSite=Lax`;
-        console.log("Token set in cookie. Redirecting...");
+        // Cookieはサーバー側(HttpOnly)でセットされるため、JSでの設定は不要
+        // document.cookie = `access_token=${data.access_token}; path=/; max-age=1800; SameSite=Lax`;
+        console.log("Token set by server. Redirecting...");
         
         // ダッシュボードへリダイレクト
         setTimeout(() => {
