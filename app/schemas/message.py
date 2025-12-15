@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Literal, Dict
 
 
 class MessageBase(BaseModel):
@@ -34,3 +34,14 @@ class MessageResponse(MessageBase):
 class MessageWithUser(MessageResponse):
     """ユーザー情報付きメッセージ"""
     username: str
+
+
+class MessageReportCreate(BaseModel):
+    """メッセージ通報作成スキーマ"""
+    label: Literal["uncomfortable", "harassment_suspected"]
+
+
+class MessageReportSummary(BaseModel):
+    """メッセージ通報集計スキーマ"""
+    message_id: int
+    counts: Dict[str, int]

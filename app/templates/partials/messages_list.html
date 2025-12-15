@@ -18,6 +18,35 @@
             <span class="text-xs text-gray-400 ml-1">(編集済み)</span>
             {% endif %}
         </div>
+        {% set uncomfortable_count = message.report_counts.get('uncomfortable', 0) %}
+        {% set harassment_count = message.report_counts.get('harassment_suspected', 0) %}
+        <div class="mt-2 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+            <button 
+                class="flex items-center gap-1 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                hx-post="/messages/{{ message.id }}/report"
+                hx-vals='{"label": "uncomfortable"}'
+                hx-target="#messages-container"
+                hx-swap="innerHTML"
+                {% if message.user_report_label %}disabled{% endif %}>
+                <span>😕 不快</span>
+                <span class="text-[11px] text-gray-500">{{ uncomfortable_count }}</span>
+            </button>
+            <button 
+                class="flex items-center gap-1 px-2 py-1 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                hx-post="/messages/{{ message.id }}/report"
+                hx-vals='{"label": "harassment_suspected"}'
+                hx-target="#messages-container"
+                hx-swap="innerHTML"
+                {% if message.user_report_label %}disabled{% endif %}>
+                <span>⚠️ ハラスメントかも</span>
+                <span class="text-[11px] text-gray-500">{{ harassment_count }}</span>
+            </button>
+            {% if message.user_report_label %}
+            <span class="text-[11px] text-gray-500">
+                報告済み: {{ "不快" if message.user_report_label == "uncomfortable" else "ハラスメントの可能性" }}
+            </span>
+            {% endif %}
+        </div>
     </div>
     
     <!-- Hover Actions -->

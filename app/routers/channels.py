@@ -9,6 +9,7 @@ from app.models.channel import Channel
 from app.models.user import User
 from app.schemas.channel import ChannelCreate, ChannelResponse
 from app.services.auth import get_current_user_required
+from app.routers.messages import get_messages_with_reports
 
 router = APIRouter(prefix="/channels", tags=["チャンネル"])
 
@@ -126,27 +127,7 @@ async def channel_detail(
     if not channel:
         raise HTTPException(status_code=404, detail="チャンネルが見つかりません")
     
-    # メッセージとユーザー情報を取得
-    from app.models.message import Message
-    messages = (
-        db.query(Message, User)
-        .join(User, Message.user_id == User.id)
-        .filter(Message.channel_id == channel_id)
-        .order_by(Message.created_at.asc())
-        .all()
-    )
-    
-    # メッセージリストを整形
-    message_list = []
-    for msg, msg_user in messages:
-        message_list.append({
-            "id": msg.id,
-            "text": msg.text,
-            "user_id": msg.user_id,
-            "username": msg_user.username,
-            "is_edited": msg.is_edited,
-            "created_at": msg.created_at,
-        })
+    message_list = get_messages_with_reports(db, channel_id, user)
     
     return templates.TemplateResponse(
         "channels/detail.html",
