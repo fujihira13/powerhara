@@ -1,4 +1,12 @@
 services:
+  adminer:
+    image: adminer
+    container_name: powerharafilter-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
   app:
     build:
       context: .
