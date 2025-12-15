@@ -1,6 +1,6 @@
 # パワハラフィルターチャット
 
-パワハラ防止フィルター付きの Slack 風チャットアプリケーション
+パワハラ防止フィルター付きの Slack 風チャットアプリケーションです。FastAPI で API と SSR（Jinja2）を提供し、HTMX でインタラクションを強化しています。JWT 認証でログインし、チャンネルごとのメッセージは WebSocket でリアルタイム同期されます。
 
 ## 技術スタック
 
@@ -29,6 +29,12 @@ cd c:\パワハラフィルターチャット
 cp .env.example .env
 ```
 
+`.env` の必須値（最低限）:
+
+- `POSTGRES_PASSWORD` … DB の postgres ユーザー用パスワード
+- `DATABASE_URL` … 例: `postgresql://postgres:<POSTGRES_PASSWORD>@db:5432/powerharafilter`
+- `SECRET_KEY` … JWT 用の十分に長いランダム文字列（本番は必ず変更）
+
 #### 3. Docker Compose でアプリを起動
 
 ```bash
@@ -37,18 +43,21 @@ docker compose up --build
 
 #### 4. データベースマイグレーション
 
-別のターミナルで以下を実行:
+初回:
 
 ```bash
-docker compose exec app alembic revision --autogenerate -m "Initial migration"
+docker compose exec app alembic revision --autogenerate -m "initial"
 docker compose exec app alembic upgrade head
 ```
+
+モデルを変更したときは再度 `revision --autogenerate` と `upgrade head` を実行してください。既存のマイグレーションがある場合は `upgrade head` のみで OK です。
 
 #### 5. アプリにアクセス
 
 - **アプリケーション**: http://localhost:8000
 - **API ドキュメント (Swagger UI)**: http://localhost:8000/docs
 - **API ドキュメント (ReDoc)**: http://localhost:8000/redoc
+- **Adminer (DB GUI)**: http://localhost:8080 （`System=PostgreSQL`, `Server=db`, `Username=postgres`, `Password=<POSTGRES_PASSWORD>`, `Database=powerharafilter`）
 
 ---
 
@@ -70,10 +79,9 @@ pip install -r requirements.txt
 
 #### 3. PostgreSQL を起動
 
-PostgreSQL がローカルで動作している必要があります。
+PostgreSQL がローカルで動作している必要があります。Docker で DB だけ起動する場合:
 
 ```bash
-# Docker で PostgreSQL のみ起動する場合
 docker run -d --name powerharafilter-db \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=postgres \
@@ -88,13 +96,14 @@ docker run -d --name powerharafilter-db \
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/powerharafilter
+POSTGRES_PASSWORD=postgres  # Docker で DB を立てたときの値に合わせる
 SECRET_KEY=your-secret-key
 ```
 
 #### 5. データベースマイグレーション
 
 ```bash
-alembic revision --autogenerate -m "Initial migration"
+alembic revision --autogenerate -m "initial"
 alembic upgrade head
 ```
 
