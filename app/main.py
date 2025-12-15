@@ -42,3 +42,27 @@ async def root(request: Request):
 async def health_check():
     """ヘルスチェック"""
     return {"status": "healthy"}
+
+
+@app.get("/auth/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """ログインページ"""
+    return templates.TemplateResponse(
+        "login.html",
+        {
+            "request": request,
+            "title": "ログイン - パワハラフィルターチャット",
+        }
+    )
+
+
+@app.get("/auth/register", response_class=HTMLResponse)
+async def register_page(request: Request):
+    """登録ページ"""
+    return templates.TemplateResponse(
+        "register.html",
+        {
+            "request": request,
+            "title": "新規登録 - パワハラフィルターチャット",
+        }
+    )
