@@ -75,6 +75,7 @@
 <script>
 // URLパラメータを確認してメッセージを表示
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Login page loaded (Version 2)"); // キャッシュ更新確認用
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('registered') === 'true') {
         document.getElementById('success-message').classList.remove('hidden');
@@ -93,33 +94,45 @@ async function handleLogin(event) {
     submitButton.disabled = true;
     submitButton.classList.add('opacity-75', 'cursor-not-allowed');
     
-    // OAuth2PasswordRequestForm対応のためにFormDataを使用
-    const formData = new FormData();
-    formData.append('username', form.email.value); // usernameフィールドにemailを入れる仕様
-    formData.append('password', form.password.value);
+    // OAuth2PasswordRequestForm対応のためにURLSearchParamsを使用
+    // FormDataコンストラクタにform要素を渡すことで、name属性を持つ全フィールド（username, password等）を自動取得
+    console.log("Saving form data...");
+    const formData = new URLSearchParams(new FormData(form));
     
     try {
+        console.log("Sending login request...");
         const response = await fetch('/auth/login', {
             method: 'POST',
-            body: formData // URLSearchParamsではなくFormDataで送る（FastAPIのForm対応）
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData,
         });
         
+        console.log("Response status:", response.status);
         const data = await response.json();
         
         if (!response.ok) {
+            console.error("Login failed:", data);
             throw new Error(data.detail || 'ログインに失敗しました');
         }
         
+        console.log("Login successful, setting token...");
         // トークンを保存（localStorageなど）
         localStorage.setItem('token', data.access_token);
         
         // クッキーにも保存しておくと便利（HTMXなどで使う場合）
-        document.cookie = `access_token=${data.access_token}; path=/; max-age=1800`;
+        // SameSite=Laxを追加してセキュリティ向上と挙動安定化
+        document.cookie = `access_token=${data.access_token}; path=/; max-age=1800; SameSite=Lax`;
+        console.log("Token set in cookie. Redirecting...");
         
         // ダッシュボードへリダイレクト
-        window.location.href = '/channels'; 
+        setTimeout(() => {
+            window.location.href = '/channels';
+        }, 100);
         
     } catch (error) {
+        console.error("Error during login:", error);
         errorDiv.textContent = error.message;
         errorDiv.classList.remove('hidden');
     } finally {

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}#{{ channel.name }} - パワハラフィルターチャット{% endblock %}
+
+{% block content %}
+<div class="flex h-[calc(100vh-4rem)] overflow-hidden">
+    <!-- Sidebar (same as list.html but could be a partial) -->
+    <div class="w-64 bg-slack-purple text-white flex-shrink-0 flex flex-col hidden md:flex">
+        <div class="p-4 border-b border-purple-800">
+            <h2 class="font-bold text-lg truncate">ワークスペース</h2>
+            <div class="flex items-center mt-2">
+                <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                <span class="text-sm text-purple-200 truncate">{{ user.username }}</span>
+            </div>
+        </div>
+        
+        <div class="p-4 flex-1 overflow-y-auto custom-scrollbar">
+            <div class="mb-6">
+                <!-- Back to list -->
+                <div class="mb-4">
+                    <a href="/channels" class="text-purple-300 hover:text-white flex items-center text-sm">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        チャンネル一覧に戻る
+                    </a>
+                </div>
+
+                <h3 class="text-purple-300 text-sm font-medium uppercase tracking-wider mb-2">チャンネル</h3>
+                <ul class="space-y-1">
+                    <li class="bg-purple-800 rounded">
+                        <a href="#" class="flex items-center px-2 py-1.5 text-white font-medium">
+                            <span class="text-purple-300 mr-2">#</span>
+                            <span class="truncate">{{ channel.name }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col bg-white dark:bg-gray-900 min-w-0">
+        <!-- Channel Header -->
+        <div class="h-16 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6 bg-white dark:bg-gray-800 flex-shrink-0 z-10">
+            <div class="flex items-center min-w-0">
+                <div class="mr-4 md:hidden">
+                    <a href="/channels" class="text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="text-lg font-bold text-gray-900 dark:text-white truncate flex items-center">
+                        <span class="text-gray-400 mr-1">#</span> {{ channel.name }}
+                    </h1>
+                    {% if channel.description %}
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ channel.description }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 text-gray-400">
+                <!-- Channel Actions -->
+                <button class="hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div id="messages-container" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-white dark:bg-gray-900">
+             {# メッセージリストはHTMX/WebSocketで管理 #}
+             {% include "partials/messages_list.html" %}
+        </div>
+
+        <!-- Message Input -->
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+            <form id="message-form" 
+                  hx-post="/channels/{{ channel.id }}/messages" 
+                  hx-target="#messages-container" 
+                  hx-swap="innerHTML"
+                  onsubmit="setTimeout(() => { this.reset(); }, 10);">
+                <div class="border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 overflow-hidden focus-within:ring-1 focus-within:ring-black focus-within:border-black transition-all">
+                    <!-- Textarea -->
+                    <textarea name="text" 
+                              class="w-full max-h-60 p-3 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 resize-none custom-scrollbar"
+                              rows="2"
+                              placeholder="#{{ channel.name }} へのメッセージ" 
+                              required
+                              onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); this.form.requestSubmit(); }"></textarea>
+                    
+                    <!-- Toolbar -->
+                    <div class="flex items-center justify-between px-2 py-2 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-600">
+                        <div class="flex space-x-1">
+                            <button type="button" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </button>
+                            <button type="button" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </button>
+                        </div>
+                        <button type="submit" class="bg-slack-green hover:bg-green-600 text-white rounded p-1.5 transition-colors">
+                            <svg class="w-4 h-4 rotate-90" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="text-center mt-1">
+                 <p class="text-xs text-gray-400"><strong>Shift + Enter</strong> で改行します</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // WebSocket接続
+    const ws = new WebSocket(`ws://${window.location.host}/ws/channels/{{ channel.id }}?token={{ request.cookies.get("access_token") }}`);
+    
+    ws.onmessage = function(event) {
+        // メッセージを受信したら一覧をリロード
+        // 本当は差分更新が良いが、簡単のため一覧全体を再取得するリクエストを飛ばす
+        // ここではHTMXの機能を使ってトリガーする
+        htmx.ajax('GET', '/channels/{{ channel.id }}', {target: 'body', swap: 'outerHTML'});
+    };
+
+    // 最下部へのスクロール
+    function scrollToBottom() {
+        const container = document.getElementById('messages-container');
+        if(container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
+    
+    // スクロール実行
+    window.addEventListener('load', scrollToBottom);
+    // HTMXのリクエスト完了後にもスクロール
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        if(evt.detail.target.id === 'messages-container') {
+            scrollToBottom();
+        }
+    });
+</script>
+{% endblock %}

@@ -78,6 +78,8 @@ async function handleRegister(event) {
         password: form.password.value
     };
     
+    console.log("Submitting registration:", formData.username, formData.email);
+    
     try {
         const response = await fetch('/auth/register', {
             method: 'POST',
@@ -88,11 +90,14 @@ async function handleRegister(event) {
         });
         
         const data = await response.json();
+        console.log("Response:", response.status, data);
         
         if (!response.ok) {
+            console.error("Registration failed:", data);
             throw new Error(data.detail || '登録中にエラーが発生しました');
         }
         
+        console.log("Registration successful. Redirecting...");
         // 登録成功 -> ログインページへリダイレクト（あるいは自動ログイン）
         // ここではUX向上のため、自動的にログインしてダッシュボードへ飛ばすのがベストですが、
         // まずはシンプルにログインページへ誘導します

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}チャンネル一覧 - パワハラフィルターチャット{% endblock %}
+
+{% block content %}
+<div class="flex h-[calc(100vh-4rem)]">
+    <!-- Sidebar -->
+    <div class="w-64 bg-slack-purple text-white flex-shrink-0 flex flex-col hidden md:flex">
+        <div class="p-4 border-b border-purple-800">
+            <h2 class="font-bold text-lg truncate">ワークスペース</h2>
+            <div class="flex items-center mt-2">
+                <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                <span class="text-sm text-purple-200 truncate">{{ user.username }}</span>
+            </div>
+        </div>
+        
+        <div class="p-4 flex-1 overflow-y-auto custom-scrollbar">
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-2 group">
+                    <h3 class="text-purple-300 text-sm font-medium uppercase tracking-wider">チャンネル</h3>
+                    <button onclick="document.getElementById('create-channel-modal').classList.remove('hidden')" 
+                            class="text-purple-300 hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </button>
+                </div>
+                <ul class="space-y-1" id="sidebar-channel-list">
+                    {% for channel in channels %}
+                    <li>
+                        <a href="/channels/{{ channel.id }}" class="flex items-center px-2 py-1.5 rounded text-purple-200 hover:bg-purple-800 hover:text-white group transition-colors">
+                            <span class="text-purple-400 mr-2 group-hover:text-white">#</span>
+                            <span class="truncate">{{ channel.name }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden">
+        <div class="p-8 max-w-4xl mx-auto w-full">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    チャンネル一覧
+                </h1>
+                <button onclick="document.getElementById('create-channel-modal').classList.remove('hidden')"
+                        class="bg-slack-green hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors flex items-center shadow-sm">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    チャンネルを作成
+                </button>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 font-medium text-gray-500 dark:text-gray-300 text-sm">
+                    <div class="col-span-8 md:col-span-12">チャンネル名</div>
+                </div>
+                
+                <div id="main-channel-list" class="divide-y divide-gray-100 dark:divide-gray-700">
+                    {% for channel in channels %}
+                    <a href="/channels/{{ channel.id }}" class="block hover:bg-gray-50 dark:hover:bg-gray-700 p-4 transition-colors group">
+                        <div class="flex items-center">
+                            <span class="text-gray-400 mr-3 text-lg group-hover:text-gray-600 dark:group-hover:text-gray-300">#</span>
+                            <div>
+                                <h3 class="text-gray-900 dark:text-white font-medium group-hover:underline decoration-gray-400">{{ channel.name }}</h3>
+                                {% if channel.description %}
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ channel.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    {% else %}
+                    <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+                        チャンネルがありません。新しいチャンネルを作成してください。
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Channel Modal -->
+<div id="create-channel-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center">
+    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4 transform transition-all">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">チャンネルを作成</h3>
+            <button onclick="document.getElementById('create-channel-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form hx-post="/channels" hx-target="#main-channel-list" hx-swap="innerHTML" 
+              hx-on::after-request="if(event.detail.successful) { document.getElementById('create-channel-modal').classList.add('hidden'); document.getElementById('channel-name').value=''; document.getElementById('channel-desc').value=''; window.location.reload(); }">
+            <div class="p-6 space-y-4">
+                <div id="channel-error-container"></div>
+                
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="channel-name">
+                        チャンネル名
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">#</span>
+                        <input class="shadow-sm appearance-none border rounded w-full py-2 pl-8 pr-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-slack-blue focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
+                               id="channel-name" name="name" type="text" placeholder="e.g. general" required autofocus>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-1">小文字、数字、ハイフンのみ使用できます。</p>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="channel-desc">
+                        説明（任意）
+                    </label>
+                    <input class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-slack-blue focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
+                           id="channel-desc" name="description" type="text" placeholder="このチャンネルの目的について">
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
+                <button type="button" onclick="document.getElementById('create-channel-modal').classList.add('hidden')"
+                        class="px-4 py-2 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md border border-gray-300 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slack-purple">
+                    キャンセル
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-slack-green text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slack-green shadow-sm text-sm font-bold">
+                    作成
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

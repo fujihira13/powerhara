@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from pathlib import Path
-from app.routers import auth
+from app.routers import auth, channels, messages
 from app.config import get_settings
 
 settings = get_settings()
@@ -24,6 +24,8 @@ templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 # ルーター登録
 app.include_router(auth.router)
+app.include_router(channels.router)
+app.include_router(messages.router)
 
 
 @app.get("/", response_class=HTMLResponse)
